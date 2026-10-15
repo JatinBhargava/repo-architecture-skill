@@ -17,6 +17,8 @@ it: one self-contained HTML file you can open, share or publish.
 - **Reference tabs:** components, data, guards and limits, and what wasn't found in the code.
 - **Animated image:** the same diagram with one flow playing through it, as an animated SVG (for
   READMEs, docs and websites), plus an MP4 and a GIF (for LinkedIn, X and chats).
+- **Link previews:** the page carries Open Graph and Twitter tags from the model's name and
+  summary, and the run makes a 1200 × 630 PNG of the flow's closing card to use as its image.
 
 Everything on the page is read from the repository and checked: a validator confirms that every
 cited file and line exists. Nothing is guessed, and nothing in the repository is ever run.
@@ -32,7 +34,7 @@ cited file and line exists. Nothing is guessed, and nothing in the repository is
 | `scripts/validate.mjs` | Checks a model, including every `file:line` it cites |
 | `scripts/render.mjs` | Validates a model and writes it into the prebuilt page |
 | `scripts/animate.mjs` | Makes an animated SVG of the diagram with one flow playing through it |
-| `scripts/animate-video.mjs` | Turns that SVG into an MP4 and a GIF; uses ffmpeg, Playwright and Chrome if present, and installs what's missing once into a cache folder |
+| `scripts/animate-video.mjs` | Turns that SVG into an MP4, a GIF and a 1200 × 630 preview PNG; uses ffmpeg, Playwright and Chrome if present, and installs what's missing once into a cache folder |
 | `runtime/architecture.html` | The prebuilt page (React, Tailwind, shadcn/ui), about 700 KB |
 | `references/model.md` | The `architecture.json` format, field by field |
 | `examples/` | A complete model for `fastapi/full-stack-fastapi-template` |
@@ -124,7 +126,8 @@ node scripts/survey.mjs work/repos/owner_repo --md work/survey.md
 node scripts/schema.mjs work/repos/owner_repo --out work/entities.json
 # write work/architecture.json (see references/model.md and examples/)
 node scripts/render.mjs work/architecture.json work/page.html --repo work/repos/owner_repo
-node scripts/animate.mjs work/architecture.json work/flow.svg --flow <flow id> --video   # SVG + MP4 + GIF
+node scripts/animate.mjs work/architecture.json work/flow.svg --flow <flow id> --video   # SVG + MP4 + GIF + PNG
+# once hosted, add the preview image: render.mjs … --url <page url> --image <png url>
 ```
 
 ## Safety

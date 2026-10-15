@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Turns an animated SVG from animate.mjs into an MP4 (for LinkedIn, X, Instagram) and a GIF (for
-// chats and anywhere video won't play), written beside the SVG.
+// Turns an animated SVG from animate.mjs into an MP4 (for LinkedIn, X, Instagram), a GIF (for
+// chats and anywhere video won't play) and a 1200 × 630 PNG (the link-preview image), written
+// beside the SVG.
 // It needs a browser (to play the SVG frame by frame) and ffmpeg. It uses what's installed: ffmpeg
 // on the PATH, playwright-core in this folder or globally, and Chrome, Chromium or Edge. Whatever is
 // missing it installs once into a cache folder (playwright-core, ffmpeg-static, and Playwright's own
@@ -130,5 +131,9 @@ run([
   "-vf", `fps=12,scale=${gifWidth}:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=160:stats_mode=full[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle`,
   "-loop", "0", `${base}.gif`,
 ])
+// The link-preview image: the closing card (the flow's summary, every part it uses lit), at the
+// 1200 × 630 Open Graph size, padded with the diagram's paper colour rather than cropped.
+const still = path.join(dir, `f${String(Math.max(0, Math.min(n - 1, Math.round((T - 0.8) * fps)))).padStart(5, "0")}.png`)
+run(["-i", still, "-vf", "scale=1200:630:force_original_aspect_ratio=decrease:flags=lanczos,pad=1200:630:(ow-iw)/2:(oh-ih)/2:color=0xfaf7f3", "-frames:v", "1", `${base}.png`])
 fs.rmSync(dir, { recursive: true, force: true })
-for (const f of [`${base}.mp4`, `${base}.gif`]) console.log(`video=${f} (${Math.round(fs.statSync(f).size / 1024)} KB)`)
+for (const f of [`${base}.mp4`, `${base}.gif`, `${base}.png`]) console.log(`file=${f} (${Math.round(fs.statSync(f).size / 1024)} KB)`)
