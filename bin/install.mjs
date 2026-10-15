@@ -75,7 +75,14 @@ function install(t, quiet = false) {
   fs.mkdirSync(t.dir, { recursive: true })
   for (const part of PARTS) {
     const from = path.join(here, part)
-    if (fs.existsSync(from)) fs.cpSync(from, path.join(t.dir, part), { recursive: true, filter: (src) => !src.includes(`${path.sep}node_modules`) })
+    // Skips a node_modules inside the skill (e.g. template/node_modules), judged below the skill's own
+    // folder: npx itself unpacks this package inside a node_modules.
+    if (fs.existsSync(from))
+      fs.cpSync(from, path.join(t.dir, part), { recursive: true, filter: (src) => !path.relative(here, src).split(path.sep).includes("node_modules") })
+  }
+  if (!fs.existsSync(path.join(t.dir, "SKILL.md"))) {
+    console.error(`✗ ${t.name}: nothing was copied into ${t.dir}`)
+    process.exit(1)
   }
   fs.writeFileSync(path.join(t.dir, MARK), `${new Date().toISOString()}\n`)
   if (!quiet) console.log(`✓ ${t.name}: installed in ${t.dir}`)
