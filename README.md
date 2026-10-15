@@ -39,6 +39,29 @@ and needs no network.
 
 ## Install
 
+### One command (npx)
+
+```bash
+npx github:JatinBhargava/repo-architecture-skill
+```
+
+This installs the skill for every AI tool it finds on your machine (Claude Code, Codex). To pick
+where it goes, add one of these:
+
+```bash
+npx github:JatinBhargava/repo-architecture-skill --claude     # Claude Code, for you
+npx github:JatinBhargava/repo-architecture-skill --codex      # Codex CLI, for you
+npx github:JatinBhargava/repo-architecture-skill --project    # ./.claude/skills, shared through git
+npx github:JatinBhargava/repo-architecture-skill --dir tools   # any folder (Cursor, Copilot, Gemini CLI…)
+npx github:JatinBhargava/repo-architecture-skill --zip        # a zip to upload to Claude.ai
+npx github:JatinBhargava/repo-architecture-skill --uninstall  # remove it again
+```
+
+Run the same command again to update. It needs Node 18+, copies the skill's files only, and runs
+nothing else.
+
+The sections below do the same by hand.
+
 ### Claude Code
 
 Put the folder in your skills directory. For just you, in every project:

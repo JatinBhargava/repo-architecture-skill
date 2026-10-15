@@ -1,0 +1,16 @@
+{
+  "name": "repo-architecture-skill",
+  "version": "1.0.0",
+  "description": "AI agent skill: turn any code repository into an interactive system-design page — diagram, request-flow simulation, endpoints, tables and columns, every step tied to file:line.",
+  "type": "module",
+  "bin": {
+    "repo-architecture-skill": "bin/install.mjs"
+  },
+  "files": ["bin", "SKILL.md", "README.md", "LICENSE", "scripts", "runtime", "references", "examples", "template"],
+  "engines": { "node": ">=18" },
+  "keywords": ["agent-skills", "claude-code", "claude", "codex", "system-design", "architecture", "diagram", "skill"],
+  "repository": { "type": "git", "url": "git+https://github.com/JatinBhargava/repo-architecture-skill.git" },
+  "homepage": "https://github.com/JatinBhargava/repo-architecture-skill#readme",
+  "author": "Jatin Bhargava",
+  "license": "MIT"
+}
