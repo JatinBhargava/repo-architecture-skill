@@ -4,15 +4,19 @@
 // connections, the line and its two parts light up, and a caption names the step. Animated with
 // SVG's own animation (SMIL), so it plays wherever SVGs show (browsers, GitHub, Notion) and can be
 // frozen at any moment for video (scripts/animate-video.mjs). Needs only Node.
-//   node animate.mjs <architecture.json> <out.svg> [--flow <id>] [--title "<text>"] [--footer "<text>"]
+// With --video it also writes an MP4 and a GIF beside the SVG (scripts/animate-video.mjs).
+//   node animate.mjs <architecture.json> <out.svg> [--flow <id>] [--title "<text>"] [--footer "<text>"] [--video]
+import { spawnSync } from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
+import { fileURLToPath } from "node:url"
 
 const args = process.argv.slice(2)
 const opt = (k) => (args.includes(k) ? args[args.indexOf(k) + 1] : null)
-const [modelPath, outPath] = args.filter((a, i) => !a.startsWith("--") && !(i > 0 && args[i - 1].startsWith("--")))
+const VALUE_FLAGS = new Set(["--flow", "--title", "--footer"])
+const [modelPath, outPath] = args.filter((a, i) => !a.startsWith("--") && !(i > 0 && VALUE_FLAGS.has(args[i - 1])))
 if (!modelPath || !outPath) {
-  console.error('usage: animate.mjs <architecture.json> <out.svg> [--flow <id>] [--title "<text>"] [--footer "<text>"]')
+  console.error('usage: animate.mjs <architecture.json> <out.svg> [--flow <id>] [--title "<text>"] [--footer "<text>"] [--video]')
   process.exit(2)
 }
 const m = JSON.parse(fs.readFileSync(modelPath, "utf8"))
@@ -281,3 +285,8 @@ ${caps.join("")}
 fs.mkdirSync(path.dirname(path.resolve(outPath)), { recursive: true })
 fs.writeFileSync(outPath, svg)
 console.log(`animated=${path.resolve(outPath)} (${Math.round(Buffer.byteLength(svg) / 1024)} KB): ${flow.id}, ${timeline.length} steps, ${T}s loop`)
+if (args.includes("--video")) {
+  const video = path.join(path.dirname(fileURLToPath(import.meta.url)), "animate-video.mjs")
+  const r = spawnSync(process.execPath, [video, path.resolve(outPath)], { stdio: "inherit" })
+  if (r.status !== 0) process.exitCode = r.status ?? 1
+}

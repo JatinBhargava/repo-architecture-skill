@@ -32,14 +32,15 @@ cited file and line exists. Nothing is guessed, and nothing in the repository is
 | `scripts/validate.mjs` | Checks a model, including every `file:line` it cites |
 | `scripts/render.mjs` | Validates a model and writes it into the prebuilt page |
 | `scripts/animate.mjs` | Makes an animated SVG of the diagram with one flow playing through it |
-| `scripts/animate-video.mjs` | Turns that SVG into an MP4 and a GIF (optional: needs ffmpeg and playwright-core) |
+| `scripts/animate-video.mjs` | Turns that SVG into an MP4 and a GIF; uses ffmpeg, Playwright and Chrome if present, and installs what's missing once into a cache folder |
 | `runtime/architecture.html` | The prebuilt page (React, Tailwind, shadcn/ui), about 700 KB |
 | `references/model.md` | The `architecture.json` format, field by field |
 | `examples/` | A complete model for `fastapi/full-stack-fastapi-template` |
 | `template/` | The page's source, only needed to change the page itself |
 
-**Requirements:** Node 18+, and git (or `gh` for private repos). Building a page installs nothing
-and needs no network.
+**Requirements:** Node 18+, and git (or `gh` for private repos). Building the page and the
+animated SVG installs nothing and needs no network. The MP4 and GIF need a browser and ffmpeg;
+they're used if installed, and otherwise installed once into a cache folder on first use.
 
 ## Install
 
@@ -123,8 +124,7 @@ node scripts/survey.mjs work/repos/owner_repo --md work/survey.md
 node scripts/schema.mjs work/repos/owner_repo --out work/entities.json
 # write work/architecture.json (see references/model.md and examples/)
 node scripts/render.mjs work/architecture.json work/page.html --repo work/repos/owner_repo
-node scripts/animate.mjs work/architecture.json work/flow.svg --flow <flow id>   # animated SVG
-node scripts/animate-video.mjs work/flow.svg                                     # + MP4 and GIF
+node scripts/animate.mjs work/architecture.json work/flow.svg --flow <flow id> --video   # SVG + MP4 + GIF
 ```
 
 ## Safety

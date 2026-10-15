@@ -106,18 +106,21 @@ The worked example is `examples/full-stack-fastapi.architecture.json` (the publi
    one at 390 px; check that the diagram's columns all show and nothing spills past the edge. Fix
    what you see in the model (long titles, too many boxes in a zone), render again, and move on.
 
-9. **Animate, when asked for an image, GIF, video or something to post.** Run
-   `node $SKILL/scripts/animate.mjs $W/architecture.json $W/<name>-<flow>.svg --flow <id>`.
-   It makes an animated SVG of the same diagram with one flow playing through it: the request dot
-   travels each hop, the hop's line and parts light up, and a caption names each step. Use the flow
-   that best shows the system, usually the main user journey. `--title` and `--footer` set the
-   headline and the address shown. The SVG plays in browsers, GitHub READMEs and Notion. For
-   LinkedIn, X or chats, `node $SKILL/scripts/animate-video.mjs <that.svg>` writes an MP4 and a GIF
-   beside it. That step needs ffmpeg and playwright-core with a Chrome; skip it, saying so, if
-   they're missing.
+9. **Animate (always).** Every run also makes the animated image, in all three formats:
+   `node $SKILL/scripts/animate.mjs $W/architecture.json $W/<name>-<flow>.svg --flow <id> --video`.
+   It writes an animated SVG of the same diagram with one flow playing through it (the request
+   dot travels each hop, the hop's line and parts light up, a caption names each step), then an
+   MP4 and a GIF beside it. Use the flow that best shows the system, usually the main user
+   journey; `--title` and `--footer` set the headline and the address shown. The SVG is for
+   READMEs, docs and websites; the MP4 for LinkedIn, X and Instagram; the GIF for chats. The video
+   step uses the machine's ffmpeg, Playwright and Chrome when present, and otherwise installs them
+   once into a cache folder, so the first run needs network access and can take a couple of
+   minutes. Give it time to finish. If it can't (no network), deliver the SVG and say which files
+   are missing and why.
 
 10. **Deliver.** If your environment can publish a page (for example an Artifact tool), publish the
-   HTML with a one-sentence description naming the repository and give the link. Otherwise give
+   HTML with a one-sentence description naming the repository and give the link. List the
+   animated SVG, MP4 and GIF with their paths and what each is for. Otherwise give
    the file path; it opens in any browser and follows its light or dark theme. In the reply, name
    the flows, the two or three things a reader should know about the design, and anything notable
    you found while reading (a missing check, an unauthenticated route), plus what went under

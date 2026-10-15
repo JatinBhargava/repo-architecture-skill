@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 // Turns an animated SVG from animate.mjs into an MP4 (for LinkedIn, X, Instagram) and a GIF (for
-// chats and anywhere video won't play). Optional: needs ffmpeg and playwright-core with a Chrome or
-// Chromium; playwright-core is found in the folder you run this in, a global install, or
-// PLAYWRIGHT_CORE (its path).
+// chats and anywhere video won't play), written beside the SVG.
+// It needs a browser (to play the SVG frame by frame) and ffmpeg. It uses what's installed: ffmpeg
+// on the PATH, playwright-core in this folder or globally, and Chrome, Chromium or Edge. Whatever is
+// missing it installs once into a cache folder (playwright-core, ffmpeg-static, and Playwright's own
+// Chromium when there's no browser), so the first run needs network access and a minute or two.
 //   node animate-video.mjs <animated.svg> [--fps 30] [--gif-width 1100] [--chrome <path>]
 import fs from "node:fs"
 import os from "node:os"
@@ -18,32 +20,85 @@ if (!fs.existsSync(svg)) {
   console.error("usage: animate-video.mjs <animated.svg> [--fps 30] [--gif-width 1100] [--chrome <path>]")
   process.exit(2)
 }
-if (spawnSync("ffmpeg", ["-version"]).status !== 0) {
-  console.error("ffmpeg isn't installed; the SVG itself is ready to use.")
+
+const PINS = { "playwright-core": "1.64.0", "ffmpeg-static": "5.3.0" }
+const CACHE =
+  process.env.REPO_ARCHITECTURE_CACHE ??
+  (process.platform === "win32"
+    ? path.join(process.env.LOCALAPPDATA ?? os.homedir(), "repo-architecture-skill")
+    : path.join(process.env.XDG_CACHE_HOME ?? path.join(os.homedir(), ".cache"), "repo-architecture-skill"))
+const fail = (why) => {
+  console.error(`${why}\nThe animated SVG is ready to use; only the MP4 and GIF weren't made.`)
   process.exit(1)
 }
-// playwright-core from PLAYWRIGHT_CORE, the folder you run this in, or a global install.
-function findPlaywright() {
-  if (process.env.PLAYWRIGHT_CORE) return process.env.PLAYWRIGHT_CORE
-  const bases = [process.cwd()]
-  const g = spawnSync("npm", ["root", "-g"], { encoding: "utf8", shell: process.platform === "win32" })
-  if (g.status === 0) bases.push(g.stdout.trim())
-  for (const b of bases) {
-    try {
-      return createRequire(path.join(b, "noop.js")).resolve("playwright-core")
-    } catch {
-      /* not here */
+const npm = (a) => spawnSync(process.platform === "win32" ? "npm.cmd" : "npm", a, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] })
+
+/** A package from this folder, a global install, or the cache; installed into the cache if missing. */
+function need(name) {
+  const bases = [process.cwd(), CACHE]
+  const g = npm(["root", "-g"])
+  if (g.status === 0) bases.push(path.dirname(g.stdout.trim()))
+  const find = () => {
+    for (const b of bases) {
+      try {
+        return createRequire(path.join(b, "noop.js")).resolve(name)
+      } catch {
+        /* not here */
+      }
     }
+    return null
   }
-  return null
+  let found = find()
+  if (!found) {
+    console.log(`Installing ${name} into ${CACHE} (once)…`)
+    fs.mkdirSync(CACHE, { recursive: true })
+    if (!fs.existsSync(path.join(CACHE, "package.json"))) fs.writeFileSync(path.join(CACHE, "package.json"), '{ "private": true }\n')
+    const r = npm(["install", "--prefix", CACHE, "--no-audit", "--no-fund", "--loglevel=error", `${name}@${PINS[name]}`])
+    if (r.status !== 0) fail(`Couldn't install ${name} (no network?): ${(r.stderr || "").trim().split("\n").pop()}`)
+    found = find()
+  }
+  return found ?? fail(`${name} couldn't be loaded.`)
 }
-const found = findPlaywright()
-if (!found) {
-  console.error("playwright-core isn't installed (npm i playwright-core in this folder, or -g); the SVG itself is ready to use.")
-  process.exit(1)
+
+// ffmpeg: the one on the PATH, else ffmpeg-static's.
+let ffmpeg = "ffmpeg"
+if (spawnSync("ffmpeg", ["-version"]).status !== 0) {
+  ffmpeg = createRequire(import.meta.url)(need("ffmpeg-static"))
+  if (!ffmpeg || !fs.existsSync(ffmpeg)) fail("ffmpeg-static has no ffmpeg build for this machine.")
 }
-const pw = await import(pathToFileURL(found).href)
+
+const pw = await import(pathToFileURL(need("playwright-core")).href)
 const chromium = pw.chromium ?? pw.default?.chromium
+
+// A browser: one that's installed, else Playwright's own Chromium (downloaded once).
+const chromePaths = [
+  opt("--chrome"),
+  process.env.CHROME_PATH,
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/Applications/Chromium.app/Contents/MacOS/Chromium",
+  "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+  "/usr/bin/google-chrome",
+  "/usr/bin/google-chrome-stable",
+  "/usr/bin/chromium",
+  "/usr/bin/chromium-browser",
+  "/usr/bin/microsoft-edge",
+  "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+].filter(Boolean)
+async function launch() {
+  const local = chromePaths.find((p) => fs.existsSync(p))
+  if (local) return chromium.launch({ executablePath: local })
+  try {
+    return await chromium.launch()
+  } catch {
+    console.log("No Chrome found; downloading Playwright's Chromium (once)…")
+    const cli = path.join(path.dirname(need("playwright-core")), "cli.js")
+    const r = spawnSync(process.execPath, [cli, "install", "chromium"], { stdio: "inherit" })
+    if (r.status !== 0) fail("Couldn't download Chromium (no network?).")
+    return chromium.launch()
+  }
+}
+
 const fps = Number(opt("--fps", 30))
 const gifWidth = Number(opt("--gif-width", 1100))
 const text = fs.readFileSync(svg, "utf8")
@@ -52,15 +107,7 @@ if (!T) {
   console.error("No animation length found in the SVG (was it made by animate.mjs?).")
   process.exit(1)
 }
-const chromePaths = [
-  opt("--chrome"),
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  "/usr/bin/google-chrome",
-  "/usr/bin/chromium",
-  "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-].filter(Boolean)
-const executablePath = chromePaths.find((p) => fs.existsSync(p))
-const browser = await chromium.launch(executablePath ? { executablePath } : {})
+const browser = await launch()
 const page = await browser.newPage({ viewport: { width: 1600, height: 900 } })
 await page.goto(pathToFileURL(svg).href)
 await page.waitForTimeout(300)
@@ -74,7 +121,7 @@ for (let i = 0; i < n; i++) {
 await browser.close()
 const base = svg.replace(/\.svg$/, "")
 const run = (a) => {
-  const r = spawnSync("ffmpeg", ["-loglevel", "error", "-y", ...a], { stdio: "inherit" })
+  const r = spawnSync(ffmpeg, ["-loglevel", "error", "-y", ...a], { stdio: "inherit" })
   if (r.status !== 0) process.exit(1)
 }
 run(["-framerate", String(fps), "-i", path.join(dir, "f%05d.png"), "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-preset", "slow", "-movflags", "+faststart", `${base}.mp4`])
