@@ -44,13 +44,13 @@ and needs no network.
 Put the folder in your skills directory. For just you, in every project:
 
 ```bash
-git clone <this repo> ~/.claude/skills/repo-architecture
+git clone https://github.com/JatinBhargava/repo-architecture-skill.git ~/.claude/skills/repo-architecture
 ```
 
 For everyone working on one project (commit it):
 
 ```bash
-git clone <this repo> .claude/skills/repo-architecture
+git clone https://github.com/JatinBhargava/repo-architecture-skill.git .claude/skills/repo-architecture
 ```
 
 Then ask: *"Make a system design page for https://github.com/owner/repo"*, or type
@@ -59,7 +59,7 @@ Then ask: *"Make a system design page for https://github.com/owner/repo"*, or ty
 ### Claude.ai and the Claude desktop app
 
 1. Turn on code execution and Skills in **Settings → Capabilities**.
-2. Upload `repo-architecture.zip` (this folder, zipped, with `SKILL.md` at its top) under **Skills**.
+2. Download the zip (green **Code** button → **Download ZIP**, or [this link](https://github.com/JatinBhargava/repo-architecture-skill/archive/refs/heads/main.zip)) and upload it under **Skills**. The folder inside has `SKILL.md` at its top.
 3. Ask for a repo's system design.
 
 Fetching from GitHub needs the sandbox to allow network access. If it doesn't, upload the repo as
