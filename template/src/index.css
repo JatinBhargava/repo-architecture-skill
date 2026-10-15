@@ -1,0 +1,197 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./shadcn.css";
+@import "@fontsource/caveat/latin-400.css";
+@import "@fontsource/caveat/latin-600.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Graph-paper look (after breakscale.tech): warm paper with a faint grid, the system sans at 14px,
+  a monospace for labels and numbers, a handwritten face for notes on the canvas, one blue accent,
+  and boxes coloured by what kind of part they are.
+*/
+@theme inline {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --font-hand: "Caveat", "Segoe Print", "Bradley Hand", Chalkboard, cursive;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-grid: var(--grid);
+  --color-grid-major: var(--grid-major);
+  --color-blue: var(--blue);
+  --color-blue-soft: var(--blue-soft);
+  --color-signal: var(--blue);
+  --color-signal-soft: var(--blue-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-ink-soft: var(--secondary);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+}
+
+:root {
+  --radius: 10px;
+  --background: #faf7f3;
+  --foreground: #1e242e;
+  --card: #fffdfa;
+  --card-foreground: #1e242e;
+  --popover: #fffdfa;
+  --popover-foreground: #1e242e;
+  --primary: #325cbd;
+  --primary-foreground: #ffffff;
+  --secondary: #f0ece5;
+  --secondary-foreground: #1e242e;
+  --muted: #f7f3ee;
+  --muted-foreground: #525862;
+  --faint: #646972;
+  --accent: #e3edff;
+  --accent-foreground: #2d5277;
+  --destructive: #c52b30;
+  --border: #e8e2da;
+  --input: #e8e2da;
+  --ring: #325cbd;
+  --line: #b3aba1;
+  --line-strong: #6f6a63;
+  --grid: #f1ece6;
+  --grid-major: #e7e2dc;
+  --blue: #325cbd;
+  --blue-soft: #e3edff;
+  --ok: #187a3b;
+  --ok-soft: #e6f4ea;
+  --warn: #945500;
+  --warn-soft: #fbeedb;
+  --bad: #c52b30;
+  --bad-soft: #fdeceb;
+  --shadow-panel: 0 1px 2px #3c32280d, 0 4px 10px #3c322812;
+
+  /* Part kinds: fill, outline, text. */
+  --client-f: #f2effe; --client-s: #866fc2; --client-i: #534775;
+  --cdn-f: #e2f6f4; --cdn-s: #00948e; --cdn-i: #005d59;
+  --gateway-f: #e5f3fe; --gateway-s: #2388c3; --gateway-i: #235575;
+  --service-f: #eaf2ff; --service-s: #567fca; --service-i: #394f79;
+  --worker-f: #edf1ff; --worker-s: #6a79ca; --worker-i: #434c79;
+  --queue-f: #f5eefc; --queue-s: #9769b8; --queue-i: #5c446f;
+  --db-f: #e4f4fd; --db-s: #008cb9; --db-i: #185771;
+  --cache-f: #fbefe2; --cache-s: #af7112; --cache-i: #6a481c;
+  --storage-f: #e2f6f6; --storage-s: #009394; --storage-i: #005c5d;
+  --cron-f: #f4f2e2; --cron-s: #928100; --cron-i: #595019;
+  --ai-f: #fcecf4; --ai-s: #b45f90; --ai-i: #6d3e58;
+  --auth-f: #e9f5e9; --auth-s: #4b934f; --auth-i: #345b35;
+  --payment-f: #ffeced; --payment-s: #be5d6c; --payment-i: #733d45;
+  --external-f: #feede5; --external-s: #ba6734; --external-i: #704328;
+}
+
+.dark {
+  --background: #16151a;
+  --foreground: #eceaf2;
+  --card: #1d1c22;
+  --card-foreground: #eceaf2;
+  --popover: #1d1c22;
+  --popover-foreground: #eceaf2;
+  --primary: #6f9bf0;
+  --primary-foreground: #16151a;
+  --secondary: #2f2e36;
+  --secondary-foreground: #eceaf2;
+  --muted: #25242b;
+  --muted-foreground: #a8a5b4;
+  --faint: #8d8a99;
+  --accent: #1b2740;
+  --accent-foreground: #a9c6ff;
+  --destructive: #f0656a;
+  --border: #302f38;
+  --input: #302f38;
+  --ring: #6f9bf0;
+  --line: #615f6e;
+  --line-strong: #a29fae;
+  --grid: #1e1d23;
+  --grid-major: #26252c;
+  --blue: #6f9bf0;
+  --blue-soft: #1b2740;
+  --ok: #4ac06e;
+  --ok-soft: #16301f;
+  --warn: #d79a2b;
+  --warn-soft: #332616;
+  --bad: #f0656a;
+  --bad-soft: #3a1d1f;
+  --shadow-panel: 0 1px 2px #0000005c, 0 4px 10px #00000070;
+
+  --client-f: #261e3a; --client-s: #ac8ff9; --client-i: #d4c7ff;
+  --cdn-f: #002c29; --cdn-s: #00beb7; --cdn-i: #90e3dc;
+  --gateway-f: #0d263c; --gateway-s: #50a9ff; --gateway-i: #a9d6ff;
+  --service-f: #15243c; --service-s: #6ea3ff; --service-i: #b5d2ff;
+  --worker-f: #1c223c; --worker-s: #889bff; --worker-i: #c0ceff;
+  --queue-f: #2b1d37; --queue-s: #c287ec; --queue-i: #e1c3fa;
+  --db-f: #022839; --db-s: #00b4ee; --db-i: #99dcfc;
+  --cache-f: #341f03; --cache-s: #e09112; --cache-i: #f4c897;
+  --storage-f: #002c2c; --storage-s: #00bfbf; --storage-i: #90e3e3;
+  --cron-f: #2a2708; --cron-s: #c9b42a; --cron-i: #e9df9d;
+  --ai-f: #34182a; --ai-s: #e48cc0; --ai-i: #f6c6e2;
+  --auth-f: #142a16; --auth-s: #6fce74; --auth-i: #bfe8c1;
+  --payment-f: #3a1a1f; --payment-s: #f0899a; --payment-i: #ffc6cf;
+  --external-f: #381b0c; --external-s: #ef8443; --external-i: #fdc2a1;
+  color-scheme: dark;
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-size: 14px;
+    font-weight: 450;
+    letter-spacing: -0.005em;
+    line-height: 1.6;
+  }
+  h1, h2, h3 { text-wrap: balance; }
+}
+
+@layer components {
+  /* An uppercase monospace label, the way the page names things. */
+  .label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.25; color: var(--muted-foreground); }
+  /* A big monospace figure. */
+  .figure { font-family: var(--font-mono); font-weight: 650; letter-spacing: -0.01em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-panel); }
+  /* Graph paper: a fine grid with a heavier line every fifth. */
+  .graph-paper {
+    background-color: var(--background);
+    background-image:
+      linear-gradient(var(--grid-major) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  }
+  .march { stroke-dasharray: 7 6; animation: march 0.9s linear infinite; }
+}
+
+@keyframes march { to { stroke-dashoffset: -26; } }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

@@ -1,0 +1,939 @@
+{
+ "meta": {
+  "name": "Full Stack FastAPI",
+  "repo": "fastapi/full-stack-fastapi-template",
+  "url": "https://github.com/fastapi/full-stack-fastapi-template",
+  "commit": "7257e60",
+  "date": "2026-10-08",
+  "summary": "A starter for web apps: a React frontend and a FastAPI backend with JWT login, users and items, behind a Traefik proxy, with PostgreSQL, password-reset emails over SMTP and optional Sentry, all run with Docker Compose.",
+  "facts": [
+   {
+    "label": "API",
+    "value": "FastAPI · /api/v1"
+   },
+   {
+    "label": "DB",
+    "value": "PostgreSQL 18 · SQLModel"
+   },
+   {
+    "label": "auth",
+    "value": "JWT HS256 · Argon2"
+   },
+   {
+    "label": "frontend",
+    "value": "React · TanStack Router"
+   },
+   {
+    "label": "deploy",
+    "value": "Docker Compose · Traefik"
+   }
+  ]
+ },
+ "zones": [
+  {
+   "id": "client",
+   "label": "Browser"
+  },
+  {
+   "id": "edge",
+   "label": "Docker host · edge"
+  },
+  {
+   "id": "app",
+   "label": "Backend"
+  },
+  {
+   "id": "data",
+   "label": "Data & outside"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "web",
+   "zone": "client",
+   "title": "React app",
+   "sub": "Vite · TanStack Router",
+   "evidence": [
+    "frontend/src/routes/__root.tsx"
+   ],
+   "kind": "client"
+  },
+  {
+   "id": "admin",
+   "zone": "client",
+   "title": "Admin's browser",
+   "sub": "adminer.<domain>",
+   "evidence": [
+    "compose.yml:44"
+   ],
+   "kind": "client"
+  },
+  {
+   "id": "traefik",
+   "zone": "edge",
+   "title": "Traefik proxy",
+   "sub": "v3.7 · routes by host",
+   "evidence": [
+    "compose.yml:4"
+   ],
+   "kind": "gateway"
+  },
+  {
+   "id": "adminer",
+   "zone": "edge",
+   "title": "Adminer",
+   "sub": "database admin UI",
+   "evidence": [
+    "compose.yml:35"
+   ],
+   "kind": "service"
+  },
+  {
+   "id": "api",
+   "zone": "app",
+   "title": "FastAPI backend",
+   "sub": "/api/v1 · CORS · OpenAPI",
+   "big": true,
+   "evidence": [
+    "backend/app/main.py:21"
+   ],
+   "kind": "service",
+   "endpoints": [
+    {
+     "method": "POST",
+     "path": "/api/v1/login/access-token",
+     "label": "Log in",
+     "evidence": [
+      "backend/app/api/routes/login.py:23"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/v1/login/test-token",
+     "label": "Check a token",
+     "evidence": [
+      "backend/app/api/routes/login.py:45"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/v1/password-recovery/{email}",
+     "label": "Send a reset email",
+     "evidence": [
+      "backend/app/api/routes/login.py:53"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/v1/reset-password/",
+     "label": "Set a new password",
+     "evidence": [
+      "backend/app/api/routes/login.py:77"
+     ]
+    },
+    {
+     "method": "GET",
+     "path": "/api/v1/items",
+     "label": "List items",
+     "evidence": [
+      "backend/app/api/routes/items.py:13"
+     ]
+    },
+    {
+     "method": "GET",
+     "path": "/api/v1/items/{id}",
+     "label": "Read an item",
+     "evidence": [
+      "backend/app/api/routes/items.py:48"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/v1/items",
+     "label": "Create an item",
+     "evidence": [
+      "backend/app/api/routes/items.py:61"
+     ]
+    },
+    {
+     "method": "PUT",
+     "path": "/api/v1/items/{id}",
+     "label": "Update an item",
+     "evidence": [
+      "backend/app/api/routes/items.py:75"
+     ]
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/v1/items/{id}",
+     "label": "Delete an item",
+     "evidence": [
+      "backend/app/api/routes/items.py:99"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/v1/users/signup",
+     "label": "Sign up",
+     "evidence": [
+      "backend/app/api/routes/users.py:146"
+     ]
+    },
+    {
+     "method": "GET",
+     "path": "/api/v1/users/me",
+     "label": "Your account",
+     "evidence": [
+      "backend/app/api/routes/users.py:124"
+     ]
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/v1/users/me",
+     "label": "Update your account",
+     "evidence": [
+      "backend/app/api/routes/users.py:81"
+     ]
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/v1/users/me/password",
+     "label": "Change your password",
+     "evidence": [
+      "backend/app/api/routes/users.py:103"
+     ]
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/v1/users/me",
+     "label": "Delete your account",
+     "evidence": [
+      "backend/app/api/routes/users.py:132"
+     ]
+    },
+    {
+     "method": "GET",
+     "path": "/api/v1/users/",
+     "label": "List users (superuser)",
+     "evidence": [
+      "backend/app/api/routes/users.py:32"
+     ]
+    },
+    {
+     "method": "POST",
+     "path": "/api/v1/users/",
+     "label": "Create a user (superuser)",
+     "evidence": [
+      "backend/app/api/routes/users.py:54"
+     ]
+    },
+    {
+     "method": "GET",
+     "path": "/api/v1/utils/health-check/",
+     "label": "Health check",
+     "evidence": [
+      "backend/app/api/routes/utils.py:29"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "auth",
+   "zone": "app",
+   "title": "Auth dependency",
+   "sub": "OAuth2 bearer · HS256",
+   "evidence": [
+    "backend/app/api/deps.py:30"
+   ],
+   "kind": "auth"
+  },
+  {
+   "id": "db",
+   "zone": "data",
+   "title": "PostgreSQL",
+   "sub": "v18 · user, item",
+   "evidence": [
+    "compose.yml:21",
+    "backend/app/models.py:51"
+   ],
+   "kind": "db",
+   "entities": [
+    {
+     "name": "user",
+     "evidence": [
+      "backend/app/alembic/versions/e2412789c190_initialize_models.py:21"
+     ],
+     "columns": [
+      {
+       "name": "email",
+       "type": "EmailStr",
+       "unique": true
+      },
+      {
+       "name": "is_active",
+       "type": "bool"
+      },
+      {
+       "name": "is_superuser",
+       "type": "bool"
+      },
+      {
+       "name": "full_name",
+       "type": "str",
+       "nullable": true
+      },
+      {
+       "name": "id",
+       "type": "uuid.UUID",
+       "key": "pk"
+      },
+      {
+       "name": "hashed_password",
+       "type": "str"
+      },
+      {
+       "name": "created_at",
+       "type": "datetime",
+       "nullable": true
+      }
+     ],
+     "label": "Accounts: email, hashed password, flags"
+    },
+    {
+     "name": "item",
+     "evidence": [
+      "backend/app/alembic/versions/e2412789c190_initialize_models.py:34"
+     ],
+     "columns": [
+      {
+       "name": "title",
+       "type": "str"
+      },
+      {
+       "name": "description",
+       "type": "str",
+       "nullable": true
+      },
+      {
+       "name": "id",
+       "type": "uuid.UUID",
+       "key": "pk"
+      },
+      {
+       "name": "created_at",
+       "type": "datetime",
+       "nullable": true
+      },
+      {
+       "name": "owner_id",
+       "type": "uuid.UUID",
+       "key": "fk",
+       "ref": "user.id"
+      }
+     ],
+     "label": "Items, each owned by a user"
+    }
+   ]
+  },
+  {
+   "id": "smtp",
+   "zone": "data",
+   "title": "SMTP server",
+   "sub": "reset and welcome mail",
+   "evidence": [
+    "backend/app/utils.py:34"
+   ],
+   "kind": "email"
+  },
+  {
+   "id": "sentry",
+   "zone": "data",
+   "title": "Sentry",
+   "sub": "errors, outside development",
+   "evidence": [
+    "backend/app/main.py:18"
+   ],
+   "kind": "external"
+  }
+ ],
+ "flows": [
+  {
+   "id": "login",
+   "name": "Log in",
+   "toggles": [
+    {
+     "id": "wrong",
+     "label": "Wrong password",
+     "hint": "400"
+    }
+   ],
+   "steps": [
+    {
+     "from": "web",
+     "to": "traefik",
+     "kind": "req",
+     "text": "POST /api/v1/login/access-token",
+     "detail": "Email and password as an OAuth2 form.",
+     "proto": "HTTPS",
+     "evidence": [
+      "backend/app/api/routes/login.py:23"
+     ]
+    },
+    {
+     "from": "traefik",
+     "to": "api",
+     "kind": "req",
+     "text": "Forward by host rule",
+     "detail": "Traefik sends the domain's traffic to the backend container on port 8000.",
+     "evidence": [
+      "compose.yml:84"
+     ],
+     "endpoint": "POST /api/v1/login/access-token"
+    },
+    {
+     "from": "api",
+     "to": "db",
+     "kind": "req",
+     "text": "SELECT user by email",
+     "evidence": [
+      "backend/app/crud.py:45"
+     ],
+     "entities": [
+      "user"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "api",
+     "kind": "check",
+     "text": "Verify the password",
+     "detail": "Argon2 (bcrypt still accepted); an unknown email is checked against a dummy hash so both cases take the same time.",
+     "evidence": [
+      "backend/app/crud.py:50",
+      "backend/app/core/security.py:11"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "web",
+     "kind": "block",
+     "text": "400 · Incorrect email or password",
+     "when": "wrong",
+     "evidence": [
+      "backend/app/api/routes/login.py:34"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "api",
+     "kind": "req",
+     "text": "create_access_token",
+     "detail": "A JWT signed with SECRET_KEY (HS256) with an expiry from ACCESS_TOKEN_EXPIRE_MINUTES.",
+     "when": "!wrong",
+     "evidence": [
+      "backend/app/core/security.py:22"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "web",
+     "kind": "res",
+     "text": "{ access_token }",
+     "detail": "The app keeps it in localStorage and sends it as a Bearer token.",
+     "evidence": [
+      "frontend/src/hooks/useAuth.ts:45"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "create",
+   "name": "Create an item",
+   "toggles": [
+    {
+     "id": "badtoken",
+     "label": "Expired or forged token",
+     "hint": "403"
+    },
+    {
+     "id": "crash",
+     "label": "Unhandled error",
+     "hint": "500"
+    }
+   ],
+   "steps": [
+    {
+     "from": "web",
+     "to": "traefik",
+     "kind": "req",
+     "text": "POST /api/v1/items",
+     "detail": "Title and description, with the Bearer token.",
+     "proto": "Bearer JWT",
+     "evidence": [
+      "backend/app/api/routes/items.py:61"
+     ]
+    },
+    {
+     "from": "traefik",
+     "to": "api",
+     "kind": "req",
+     "text": "Forward to the backend",
+     "evidence": [
+      "compose.yml:84"
+     ],
+     "endpoint": "POST /api/v1/items"
+    },
+    {
+     "from": "api",
+     "to": "auth",
+     "kind": "check",
+     "text": "get_current_user",
+     "detail": "Decodes and checks the JWT's signature and expiry.",
+     "evidence": [
+      "backend/app/api/deps.py:30"
+     ]
+    },
+    {
+     "from": "auth",
+     "to": "web",
+     "kind": "block",
+     "text": "403 · Could not validate credentials",
+     "when": "badtoken",
+     "evidence": [
+      "backend/app/api/deps.py:37"
+     ]
+    },
+    {
+     "from": "auth",
+     "to": "db",
+     "kind": "req",
+     "text": "Load the user",
+     "detail": "404 if gone, 400 if inactive.",
+     "evidence": [
+      "backend/app/api/deps.py:41"
+     ],
+     "entities": [
+      "user"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "sentry",
+     "kind": "block",
+     "text": "500 · reported to Sentry",
+     "detail": "When SENTRY_DSN is set and the app isn't in development.",
+     "when": "crash",
+     "evidence": [
+      "backend/app/main.py:18"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "db",
+     "kind": "req",
+     "text": "INSERT item (owner_id = user)",
+     "detail": "The item is owned by whoever is logged in.",
+     "evidence": [
+      "backend/app/api/routes/items.py:68"
+     ],
+     "entities": [
+      "item"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "web",
+     "kind": "res",
+     "text": "ItemPublic",
+     "evidence": [
+      "backend/app/api/routes/items.py:61"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "read",
+   "name": "Open an item",
+   "toggles": [
+    {
+     "id": "other",
+     "label": "Item belongs to someone else",
+     "hint": "403"
+    }
+   ],
+   "steps": [
+    {
+     "from": "web",
+     "to": "traefik",
+     "kind": "req",
+     "text": "GET /api/v1/items/{id}",
+     "proto": "Bearer JWT",
+     "evidence": [
+      "backend/app/api/routes/items.py:48"
+     ]
+    },
+    {
+     "from": "traefik",
+     "to": "api",
+     "kind": "req",
+     "text": "Forward to the backend",
+     "endpoint": "GET /api/v1/items/{id}"
+    },
+    {
+     "from": "api",
+     "to": "auth",
+     "kind": "check",
+     "text": "get_current_user",
+     "evidence": [
+      "backend/app/api/deps.py:30"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "db",
+     "kind": "req",
+     "text": "SELECT item by id",
+     "detail": "404 if it doesn't exist.",
+     "evidence": [
+      "backend/app/api/routes/items.py:53"
+     ],
+     "entities": [
+      "item"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "api",
+     "kind": "check",
+     "text": "Owner or superuser?",
+     "detail": "Only the owner, or a superuser, may read it.",
+     "evidence": [
+      "backend/app/api/routes/items.py:56"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "web",
+     "kind": "block",
+     "text": "403 · Not enough permissions",
+     "when": "other",
+     "evidence": [
+      "backend/app/api/routes/items.py:57"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "web",
+     "kind": "res",
+     "text": "ItemPublic"
+    }
+   ]
+  },
+  {
+   "id": "signup",
+   "name": "Sign up",
+   "toggles": [
+    {
+     "id": "taken",
+     "label": "Email already registered",
+     "hint": "400"
+    }
+   ],
+   "steps": [
+    {
+     "from": "web",
+     "to": "traefik",
+     "kind": "req",
+     "text": "POST /api/v1/users/signup",
+     "detail": "Email, password, name.",
+     "evidence": [
+      "backend/app/api/routes/users.py:146"
+     ]
+    },
+    {
+     "from": "traefik",
+     "to": "api",
+     "kind": "req",
+     "text": "Forward to the backend",
+     "endpoint": "POST /api/v1/users/signup"
+    },
+    {
+     "from": "api",
+     "to": "db",
+     "kind": "check",
+     "text": "Email already used?",
+     "evidence": [
+      "backend/app/api/routes/users.py:151"
+     ],
+     "entities": [
+      "user"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "web",
+     "kind": "block",
+     "text": "400 · The user with this email already exists",
+     "when": "taken",
+     "evidence": [
+      "backend/app/api/routes/users.py:153"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "db",
+     "kind": "req",
+     "text": "INSERT user (hashed password)",
+     "evidence": [
+      "backend/app/api/routes/users.py:158"
+     ],
+     "entities": [
+      "user"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "web",
+     "kind": "res",
+     "text": "UserPublic",
+     "detail": "The person then logs in."
+    }
+   ]
+  },
+  {
+   "id": "reset",
+   "name": "Reset a password",
+   "toggles": [
+    {
+     "id": "expired",
+     "label": "Expired reset link",
+     "hint": "400"
+    }
+   ],
+   "steps": [
+    {
+     "from": "web",
+     "to": "traefik",
+     "kind": "req",
+     "text": "POST /api/v1/password-recovery/{email}",
+     "evidence": [
+      "backend/app/api/routes/login.py:53"
+     ]
+    },
+    {
+     "from": "traefik",
+     "to": "api",
+     "kind": "req",
+     "text": "Forward to the backend",
+     "endpoint": "POST /api/v1/password-recovery/{email}"
+    },
+    {
+     "from": "api",
+     "to": "db",
+     "kind": "req",
+     "text": "Find the user",
+     "evidence": [
+      "backend/app/api/routes/login.py:54"
+     ],
+     "entities": [
+      "user"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "api",
+     "kind": "req",
+     "text": "generate_password_reset_token",
+     "detail": "A signed token valid for EMAIL_RESET_TOKEN_EXPIRE_HOURS.",
+     "evidence": [
+      "backend/app/utils.py:105"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "smtp",
+     "kind": "req",
+     "text": "Send the reset email",
+     "detail": "Through the configured SMTP host, with TLS or SSL when set.",
+     "evidence": [
+      "backend/app/utils.py:56"
+     ]
+    },
+    {
+     "from": "web",
+     "to": "api",
+     "kind": "req",
+     "text": "POST /api/v1/reset-password/",
+     "detail": "The token from the email and the new password.",
+     "evidence": [
+      "backend/app/api/routes/login.py:77"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "web",
+     "kind": "block",
+     "text": "400 · Invalid token",
+     "detail": "An unknown user gets the same answer, so emails can't be probed.",
+     "when": "expired",
+     "evidence": [
+      "backend/app/api/routes/login.py:84",
+      "backend/app/api/routes/login.py:88"
+     ]
+    },
+    {
+     "from": "api",
+     "to": "db",
+     "kind": "req",
+     "text": "UPDATE the password hash",
+     "evidence": [
+      "backend/app/api/routes/login.py:92"
+     ],
+     "entities": [
+      "user"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "adminer",
+   "name": "Inspect the database",
+   "steps": [
+    {
+     "from": "admin",
+     "to": "traefik",
+     "kind": "req",
+     "text": "adminer.<domain>",
+     "detail": "Traefik routes the adminer subdomain to the Adminer container.",
+     "evidence": [
+      "compose.yml:44"
+     ]
+    },
+    {
+     "from": "traefik",
+     "to": "adminer",
+     "kind": "req",
+     "text": "Forward to port 8080",
+     "evidence": [
+      "compose.yml:47"
+     ]
+    },
+    {
+     "from": "adminer",
+     "to": "db",
+     "kind": "req",
+     "text": "Log in with database credentials",
+     "detail": "Adminer talks to PostgreSQL directly on the compose network.",
+     "evidence": [
+      "compose.yml:36"
+     ],
+     "entities": [
+      "user",
+      "item"
+     ]
+    },
+    {
+     "from": "adminer",
+     "to": "admin",
+     "kind": "res",
+     "text": "Tables user and item"
+    }
+   ]
+  }
+ ],
+ "components": [
+  {
+   "name": "Frontend",
+   "tech": "React, Vite, TanStack Router and Query",
+   "where": "browser",
+   "role": "Login, sign-up, items and user settings; the generated API client.",
+   "evidence": [
+    "frontend/package.json"
+   ]
+  },
+  {
+   "name": "Backend",
+   "tech": "FastAPI, SQLModel, pwdlib, PyJWT",
+   "where": "backend container",
+   "role": "The /api/v1 REST API, and serves the built frontend.",
+   "evidence": [
+    "backend/app/main.py",
+    "backend/pyproject.toml"
+   ]
+  },
+  {
+   "name": "Proxy",
+   "tech": "Traefik v3.7",
+   "where": "proxy container",
+   "role": "Routes the domain to the backend and adminer.<domain> to Adminer.",
+   "evidence": [
+    "compose.yml:4"
+   ]
+  },
+  {
+   "name": "Database",
+   "tech": "PostgreSQL 18, Alembic migrations",
+   "where": "db container",
+   "role": "Users and items.",
+   "evidence": [
+    "compose.yml:21",
+    "backend/app/alembic/versions/e2412789c190_initialize_models.py"
+   ]
+  }
+ ],
+ "data": [
+  {
+   "name": "user",
+   "holds": "Email, hashed password, name, active, superuser",
+   "evidence": [
+    "backend/app/models.py:51"
+   ]
+  },
+  {
+   "name": "item",
+   "holds": "Title, description, owner",
+   "evidence": [
+    "backend/app/models.py:87"
+   ]
+  }
+ ],
+ "guards": [
+  {
+   "what": "Every item and user route",
+   "limit": "—",
+   "checks": "JWT (HS256) with expiry; inactive users refused",
+   "evidence": [
+    "backend/app/api/deps.py:30"
+   ]
+  },
+  {
+   "what": "Items",
+   "limit": "—",
+   "checks": "Owner or superuser only",
+   "evidence": [
+    "backend/app/api/routes/items.py:56"
+   ]
+  },
+  {
+   "what": "Login",
+   "limit": "no rate limit found",
+   "checks": "Argon2, equal timing for unknown emails",
+   "evidence": [
+    "backend/app/crud.py:50"
+   ]
+  },
+  {
+   "what": "Password reset",
+   "limit": "token expiry",
+   "checks": "Same error for unknown users",
+   "evidence": [
+    "backend/app/api/routes/login.py:88"
+   ]
+  }
+ ],
+ "unknowns": [
+  "No rate limiting on login or password reset was found in the backend.",
+  "No background jobs or queues: emails are sent inside the request.",
+  "Production hosting beyond Docker Compose (cloud, region) isn't in the repository."
+ ]
+}
