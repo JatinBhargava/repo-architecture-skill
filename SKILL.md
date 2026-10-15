@@ -115,9 +115,10 @@ The worked example is `examples/full-stack-fastapi.architecture.json` (the publi
    dot travels each hop, the hop's line and parts light up, a caption names each step), then an
    MP4, a GIF and a 1200 × 630 PNG of the closing card beside it. Use the flow that best shows the
    system, usually the main user journey; `--title` and `--footer` set the headline and the
-   address shown. The SVG is for READMEs, docs and websites; the MP4 for LinkedIn, X and
-   Instagram; the GIF for chats; the PNG for link previews. The video step uses the machine's ffmpeg, Playwright and Chrome when present, and otherwise installs them
-   once into a cache folder, so the first run needs network access and can take a couple of
+   address shown; `--tag` the bottom-left line ("Sketch your product →" by default). The SVG is
+   for READMEs, docs and websites; the MP4 for LinkedIn, X and Instagram; the GIF for chats; the
+   PNG for link previews. The video step uses the machine's ffmpeg, Playwright and Chrome when
+   present, and otherwise installs them once into a cache folder, so the first run needs network access and can take a couple of
    minutes. Give it time to finish. If it can't (no network), deliver the SVG and say which files
    are missing and why.
 

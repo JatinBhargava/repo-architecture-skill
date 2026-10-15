@@ -5,7 +5,8 @@
 // SVG's own animation (SMIL), so it plays wherever SVGs show (browsers, GitHub, Notion) and can be
 // frozen at any moment for video (scripts/animate-video.mjs). Needs only Node.
 // With --video it also writes an MP4 and a GIF beside the SVG (scripts/animate-video.mjs).
-//   node animate.mjs <architecture.json> <out.svg> [--flow <id>] [--title "<text>"] [--footer "<text>"] [--video]
+//   node animate.mjs <architecture.json> <out.svg> [--flow <id>] [--title "<text>"] [--footer "<text>"] [--tag "<text>"] [--video]
+// --tag sets the short line in the bottom-left corner ("Sketch your product →" unless given; --tag "" leaves it out).
 import { spawnSync } from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
@@ -13,10 +14,10 @@ import { fileURLToPath } from "node:url"
 
 const args = process.argv.slice(2)
 const opt = (k) => (args.includes(k) ? args[args.indexOf(k) + 1] : null)
-const VALUE_FLAGS = new Set(["--flow", "--title", "--footer"])
+const VALUE_FLAGS = new Set(["--flow", "--title", "--footer", "--tag"])
 const [modelPath, outPath] = args.filter((a, i) => !a.startsWith("--") && !(i > 0 && VALUE_FLAGS.has(args[i - 1])))
 if (!modelPath || !outPath) {
-  console.error('usage: animate.mjs <architecture.json> <out.svg> [--flow <id>] [--title "<text>"] [--footer "<text>"] [--video]')
+  console.error('usage: animate.mjs <architecture.json> <out.svg> [--flow <id>] [--title "<text>"] [--footer "<text>"] [--tag "<text>"] [--video]')
   process.exit(2)
 }
 const m = JSON.parse(fs.readFileSync(modelPath, "utf8"))
@@ -256,6 +257,7 @@ const legend = ["req", "res", "check", "block"]
   .map((k, j) => `<circle cx="${1186 + j * 92}" cy="96" r="5" fill="${TONE[k]}"/><text x="${1196 + j * 92}" y="100" class="mono" font-size="12" letter-spacing="0.6" fill="#525862">${WORD[k]}</text>`)
   .join("")
 const title = opt("--title") ?? `${flow.name}, hop by hop`
+const tag = opt("--tag") ?? "Sketch your product →"
 const footer = opt("--footer") ?? (m.meta.url ? m.meta.url.replace(/^https?:\/\//, "") : m.meta.repo)
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="t d">
@@ -279,6 +281,7 @@ ${legend}
 ${caps.join("")}
 <rect x="80" y="${H - 40}" width="1440" height="4" rx="2" fill="#ece7e0"/>
 <rect x="80" y="${H - 40}" width="0" height="4" rx="2" fill="#325cbd"><animate attributeName="width" values="0;1440;1440" keyTimes="0;${kt(timeline.at(-1).until)};1" ${ANIM}/></rect>
+${tag ? `<text x="80" y="${H - 52}" class="mono" font-size="14" font-weight="650" letter-spacing="0.4" fill="#1e242e">${esc(tag)}</text>` : ""}
 <text x="1520" y="${H - 52}" text-anchor="end" class="mono" font-size="14" font-weight="650" fill="#325cbd">${esc(footer)}</text>
 </svg>
 `

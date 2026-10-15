@@ -127,6 +127,7 @@ node scripts/schema.mjs work/repos/owner_repo --out work/entities.json
 # write work/architecture.json (see references/model.md and examples/)
 node scripts/render.mjs work/architecture.json work/page.html --repo work/repos/owner_repo
 node scripts/animate.mjs work/architecture.json work/flow.svg --flow <flow id> --video   # SVG + MP4 + GIF + PNG
+# --title, --footer (bottom right) and --tag (bottom left, "Sketch your product →" by default) set the image's text
 # once hosted, add the preview image: render.mjs … --url <page url> --image <png url>
 ```
 
